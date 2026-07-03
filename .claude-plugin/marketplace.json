@@ -1,0 +1,16 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "hb-corporation",
+  "description": "HB Corporation — 멀티에이전트 회사 + 자기성장 코딩 어시스턴트",
+  "owner": { "name": "hanbin" },
+  "plugins": [
+    {
+      "name": "hb-corporation",
+      "description": "클로드 코드 위의 회사형 코딩 어시스턴트 — 설계→구현→검증 부서 위임 + 헌법 게이트 기반 자기성장",
+      "version": "0.1.0",
+      "source": "./",
+      "category": "development",
+      "keywords": ["multi-agent", "self-growth", "coding-assistant"]
+    }
+  ]
+}
