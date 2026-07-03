@@ -17,8 +17,9 @@ Team이면 **필요한 부서만** Agent 도구로 스폰. 전원 소집 금지.
 - `strategy-director` — 설계·접근·기술부채 (코드 안 짬)
 - `dev-manager` — 구현·리팩토링
 - `qa-manager` — 검증·테스트·헌법 게이트
+- `scribe-manager` — 서기: 작업 기록·memory 축적 (팀 작업 마무리 단계)
 
-흐름: `strategy-director`(설계) → `dev-manager`(구현) → `qa-manager`(검증). 간단하면 dev → qa만.
+흐름: `strategy-director`(설계) → `dev-manager`(구현) → `qa-manager`(검증) → `scribe-manager`(기록). 간단하면 dev → qa → scribe.
 
 **중요:** 부서를 스폰할 때 task에 (a) 관련 헌법 규칙과 (b) 관련 memory 패턴을 함께 넣어준다.
 부서 서브에이전트는 플러그인의 헌법 파일을 직접 못 읽으므로, 리더가 전달해야 한다.
@@ -27,6 +28,9 @@ Team이면 **필요한 부서만** Agent 도구로 스폰. 전원 소집 금지.
 - REJECT → 사유를 `dev-manager`에게 전달해 **1회 재작업**.
 - 재작업도 REJECT → 사용자에게 보고 (무한 루프 금지 = 사람 개입/HITL).
 
-## 5. 성장 (작업 후 — 자동)
-**Team 작업이 완료되고 qa-manager 판정이 나오면, 사용자가 시키지 않아도 리더가 reflect 스킬을 수행**해 교훈을 `.hb/memory/`에 축적한다. Simple 작업은 남길 교훈이 있을 때만.
-판정·저장 기준은 reflect 스킬을 따른다. 사용자가 `/reflect`를 직접 호출할 수도 있다.
+## 5. 성장 (팀 해산 = 서기)
+부서 보고는 훅이 자동으로 `.hb/scratch/pending.jsonl`에 임시저장한다 (리더가 신경 쓸 것 없음).
+**팀 작업이 전부 끝났다고 판단하면(재작업 루프 종료 후), 리더는 `scribe-manager`를 스폰해 기록시킨다.**
+스폰 시 task에 qa 판정·채택/revert 여부 등 객관 사실을 실어 보낸다.
+미청산 기록이 있으면 Stop 게이트가 종료를 차단하니, 서기 없이 응답을 끝낼 수 없다.
+판정·저장 기준은 scribe-manager 정의를 따른다. 사용자가 `/reflect`로 직접 부를 수도 있다.

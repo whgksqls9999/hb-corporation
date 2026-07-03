@@ -1,6 +1,10 @@
 """SessionStart 훅: HB Corporation 헌법 + 리더 운영 규칙을 세션 컨텍스트에 주입한다."""
 import os
 import json
+import sys
+
+# Windows 콘솔 기본 인코딩(cp949)이 JSON 출력을 깨뜨리지 않도록 UTF-8 강제
+sys.stdout.reconfigure(encoding="utf-8")
 
 
 def _root() -> str:

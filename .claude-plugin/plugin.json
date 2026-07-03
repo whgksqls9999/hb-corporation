@@ -1,6 +1,6 @@
 {
   "name": "hb-corporation",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "클로드 코드 위의 멀티에이전트 회사 + 자기성장 코딩 어시스턴트. 리더가 요청을 분류·위임하고, 헌법 게이트로 올바른 방향의 지식만 축적한다.",
   "author": { "name": "hanbin" },
   "keywords": ["multi-agent", "self-growth", "coding-assistant", "constitution", "gnosis", "madcat"],

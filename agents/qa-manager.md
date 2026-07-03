@@ -18,3 +18,7 @@ tools: Read, Grep, Glob, Bash
 ## 판정
 - **PASS** / **PASS(개선 여지: …)** / **REJECT + 사유**
 - L1·L3는 애매하면 REJECT 쪽으로 (방향 우선).
+
+## 보고
+판정과 함께 근거를 1~2줄로 남긴다: 무엇을 확인했나 / 어떻게 확인했나(grep·test 등).
+(이 보고는 훅이 자동 저장해 scribe-manager의 기록 재료가 된다.)
