@@ -24,8 +24,6 @@
 - 기본값: 비어 있음. 각 프로젝트가 채운다.
 
 ## 게이트 규칙
-- 저장 전 L1·L2와 (있으면) L3를 검사한다.
-- L1 위반 또는 revert됨 → patterns 저장 안 함, anti-patterns에만 기록.
-- L2 어긋남 → 저장하되 "개선 여지" 메모.
 - 기준은 변경의 크기가 아니라 방향이다. [판단]
-- [객관] 항목은 reviewer가 grep/test/diff로 실제 확인한다.
+- [객관] 항목은 qa-manager가 grep/test/diff로 실제 확인한다.
+- 지식 저장 시의 세부 판정(patterns/anti-patterns 분기)은 reflect 스킬이 정의한다.

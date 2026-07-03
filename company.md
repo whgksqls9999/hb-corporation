@@ -27,7 +27,6 @@ Team이면 **필요한 부서만** Agent 도구로 스폰. 전원 소집 금지.
 - REJECT → 사유를 `dev-manager`에게 전달해 **1회 재작업**.
 - 재작업도 REJECT → 사용자에게 보고 (무한 루프 금지 = 사람 개입/HITL).
 
-## 5. 성장 (작업 후)
-작업이 끝나면 `/reflect`로 교훈을 `.hb/memory/`에 축적한다.
-- 헌법 통과 + 채택 → `.hb/memory/patterns/`
-- 헌법 위반 또는 revert → `.hb/memory/anti-patterns/`
+## 5. 성장 (작업 후 — 자동)
+**Team 작업이 완료되고 qa-manager 판정이 나오면, 사용자가 시키지 않아도 리더가 reflect 스킬을 수행**해 교훈을 `.hb/memory/`에 축적한다. Simple 작업은 남길 교훈이 있을 때만.
+판정·저장 기준은 reflect 스킬을 따른다. 사용자가 `/reflect`를 직접 호출할 수도 있다.

@@ -43,14 +43,15 @@
   simple → 리더가 직접 처리
   team   → strategy-director(설계) → dev-manager(구현) → qa-manager(검증)
            REJECT면 1회 재작업(Reflexion) → 또 실패면 사용자에게(HITL)
-작업 후 → /reflect → 헌법 게이트 → .hb/memory/에 patterns / anti-patterns 축적
+작업 후 → 리더가 자동 reflect → 헌법 게이트 → .hb/memory/에 patterns / anti-patterns 축적
 다음에 → /recall <주제> → 관련 지식 소환
 ```
 
 ## 로드맵
 
 - [x] **1단계** — 헌법 3층 + 부서 3개 + reflect 성장 루프
-- [x] **2단계(일부)+5단계** — 플러그인 패키징 (설치 가능)
-- [ ] **3단계** — hooks 확장 (작업 후 자동 reflect, 세션 종료 개선 루프)
+- [x] **2단계(일부)+5단계** — 플러그인 패키징 (설치 가능, 전 라이프사이클 검증 완료)
+- [x] **3단계(일부)** — Team 작업 후 자동 reflect
+- [ ] **3단계(나머지)** — 세션 종료 개선 루프 (훅)
 - [ ] **4단계** — 멀티 PC git 동기화
 - [ ] 부서 확장 (frontend 등 필요할 때만)
