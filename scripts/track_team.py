@@ -35,8 +35,16 @@ def main() -> None:
     }
 
     cwd = data.get("cwd") or os.getcwd()
-    scratch = os.path.join(cwd, ".hb", "scratch")
+    hb = os.path.join(cwd, ".hb")
+    scratch = os.path.join(hb, "scratch")
     os.makedirs(scratch, exist_ok=True)
+
+    # 멀티 PC 동기화: memory는 커밋되고 scratch(임시 장부)만 git에서 제외되도록
+    gitignore = os.path.join(hb, ".gitignore")
+    if not os.path.exists(gitignore):
+        with open(gitignore, "w", encoding="utf-8") as f:
+            f.write("scratch/\n")
+
     with open(os.path.join(scratch, "pending.jsonl"), "a", encoding="utf-8") as f:
         f.write(json.dumps(entry, ensure_ascii=False) + "\n")
 

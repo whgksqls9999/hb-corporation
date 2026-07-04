@@ -24,8 +24,13 @@
 | `agents/`                                         | 부서: `strategy-director`(설계) · `dev-manager`(구현) · `qa-manager`(검증) · `scribe-manager`(기록, haiku) |
 | `skills/reflect/`                                 | 성장 루프: 반성 → 헌법 게이트 → 저장                                       |
 | `commands/recall.md`                              | 축적 지식 조회                                                             |
+| `commands/consolidate.md`                         | 아우터루프 — 카드 병합·아카이브 (서기 정리 모드)                           |
 
 **메모리는 플러그인에 없다.** 각 프로젝트의 `.hb/memory/`에 쌓인다 (씨앗은 배포, 나무는 프로젝트마다).
+
+## 멀티 PC 동기화
+- **플러그인 자체** — GitHub 레포가 원천. 다른 PC에서 `/plugin marketplace add whgksqls9999/hb-corporation` → 설치. 갱신은 `/plugin update`.
+- **축적 지식(`.hb/`)** — 각 프로젝트 레포에 커밋해서 동기화한다. 훅이 `.hb/.gitignore`를 자동 생성해 `memory/`(지식)는 커밋되고 `scratch/`(임시 장부)만 제외된다.
 
 ## 설치
 
@@ -56,6 +61,6 @@
 - [x] **1단계** — 헌법 3층 + 부서 + 성장 루프
 - [x] **2단계(일부)+5단계** — 플러그인 패키징 (설치 가능, 전 라이프사이클 검증 완료)
 - [x] **3단계** — 기록 자동화: 부서 보고 자동 임시저장(PostToolUse) + 서기 강제(Stop 게이트)
-- [ ] **아우터루프** — 쌓인 카드 consolidation (중복 병합·승급·아카이브)
-- [ ] **4단계** — 멀티 PC git 동기화
-- [ ] 부서 확장 (frontend 등 필요할 때만)
+- [x] **아우터루프** — `/consolidate` + 임계(15장) 초과 시 세션 시작 알림 + 서기 정리 모드 (병합·모순 해소·archive/ 이동)
+- [x] **4단계** — 멀티 PC 동기화 (플러그인=GitHub, 지식=프로젝트 레포 커밋, scratch만 자동 제외)
+- [ ] 부서 확장 (frontend 등 — 의도적 보류: 필요할 때만 얇게)
