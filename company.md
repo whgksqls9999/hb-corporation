@@ -15,8 +15,8 @@
 ## 3. 부서 (서브에이전트)
 Team이면 **필요한 부서만** Agent 도구로 스폰. 전원 소집 금지.
 - `strategy-director` — 설계·접근·기술부채 (코드 안 짬)
-- `dev-manager` — 구현·리팩토링
-- `qa-manager` — 검증·테스트·헌법 게이트
+- `dev-manager` — 구현·테스트 작성(test-first)·리팩토링
+- `qa-manager` — 검증·테스트 실행/리뷰·헌법 게이트 (테스트를 쓰지 않음)
 - `scribe-manager` — 서기: 작업 기록·memory 축적 (팀 작업 마무리 단계)
 
 흐름: `strategy-director`(설계) → `dev-manager`(구현) → `qa-manager`(검증) → `scribe-manager`(기록). 간단하면 dev → qa → scribe.
