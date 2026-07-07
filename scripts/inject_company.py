@@ -2,7 +2,8 @@
 세션 컨텍스트에 주입한다. 카드가 임계치를 넘으면 아우터루프(consolidation) 권고도 함께 주입한다.
 
 - 헌법(company.md/constitution.md): 플러그인 루트에서 읽어 항상 주입.
-- L3(<cwd>/.hb/project.md): 헌법만 강제되던 빈틈 보완. 작으면 통째, 크면 목차+강제 Read 지시."""
+- L3(<cwd>/.hb/project.md): 헌법만 강제되던 빈틈 보완. 작으면 통째, 크면 목차+강제 Read 지시.
+- memory 인덱스(<cwd>/.hb/memory/INDEX.md): 리더가 관련 패턴을 골라 위임하도록 목록 노출. 작으면 통째, 크면 /recall 안내."""
 import os
 import json
 import sys
@@ -13,6 +14,7 @@ sys.stdout.reconfigure(encoding="utf-8")
 
 CONSOLIDATE_THRESHOLD = 15  # 카드가 이 수를 넘으면 정리 권고
 L3_MAX_BYTES_DEFAULT = 24000  # project.md 가 이보다 크면 통째 대신 목차만 주입
+INDEX_MAX_BYTES_DEFAULT = 12000  # INDEX.md 가 이보다 크면 통째 대신 /recall 안내만
 
 
 def _root() -> str:
@@ -86,6 +88,39 @@ def _project_l3(cwd: str) -> str:
     )
 
 
+def _memory_index(cwd: str) -> str:
+    """memory 카드 인덱스(INDEX.md) 주입. 리더가 지금 작업과 관련된 패턴을 골라
+    부서 task 에 실을 수 있도록 목록을 노출한다. 작으면 통째, 크면 /recall 안내만(컨텍스트 폭주 방지)."""
+    try:
+        with open(os.path.join(cwd, ".hb", "memory", "INDEX.md"), encoding="utf-8") as f:
+            text = f.read().strip()
+    except OSError:
+        return ""  # 인덱스 없음 → 주입 안 함
+    if not text:
+        return ""
+
+    try:
+        max_bytes = int(os.environ.get("HB_INDEX_MAX_BYTES", str(INDEX_MAX_BYTES_DEFAULT)))
+    except ValueError:
+        max_bytes = INDEX_MAX_BYTES_DEFAULT
+
+    header = "\n\n---\n\n# memory 카드 인덱스 (`.hb/memory/INDEX.md`)\n\n"
+    size = len(text.encode("utf-8"))
+
+    if size <= max_bytes:
+        return (
+            header + text +
+            "\n\n[활용] 위는 이 프로젝트에 축적된 패턴/안티패턴 목록이다. 지금 작업과 관련된 것만 "
+            "골라 부서 스폰 task 에 실어라(전부 아님). 상세는 해당 카드 파일을 Read 하거나 `/recall`."
+        )
+
+    return (
+        header +
+        f"[주의] 인덱스가 큼({size}B > {max_bytes}B) → 전체 대신 안내만. "
+        "지금 작업과 관련된 패턴은 `/recall <주제>` 로 조회하라."
+    )
+
+
 def main() -> None:
     root = _root()
     cwd = _cwd()
@@ -101,6 +136,9 @@ def main() -> None:
 
     # L3(project.md) 강제 주입 — 헌법만 강제하던 빈틈 보완
     context += _project_l3(cwd)
+
+    # memory 카드 인덱스 주입 — 리더가 관련 패턴을 골라 부서 task 에 실을 수 있도록 목록 노출
+    context += _memory_index(cwd)
 
     cards = _count_cards(cwd)
     if cards > CONSOLIDATE_THRESHOLD:

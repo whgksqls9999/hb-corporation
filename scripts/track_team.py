@@ -7,6 +7,7 @@
 import json
 import os
 import sys
+import time
 
 # Windows 콘솔 기본 인코딩(cp949) 문제 방지
 sys.stdin.reconfigure(encoding="utf-8", errors="replace")
@@ -49,8 +50,22 @@ def main() -> None:
         with open(gitignore, "w", encoding="utf-8") as f:
             f.write("scratch/\n")
 
-    with open(os.path.join(scratch, "pending.jsonl"), "a", encoding="utf-8") as f:
-        f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+    # 원자적 append: 기존 내용 전체를 읽어 새 라인을 붙인 뒤 임시파일에 쓰고 os.replace.
+    # (단일 append 쓰기가 중단되면 파일이 truncate 되는 사고를 차단. 동시성 lost-update는 범위 밖.)
+    pending = os.path.join(scratch, "pending.jsonl")
+    try:
+        with open(pending, encoding="utf-8") as f:
+            existing = f.read()
+    except OSError:
+        existing = ""
+
+    new_line = json.dumps(entry, ensure_ascii=False) + "\n"
+    tmp = os.path.join(scratch, "pending.jsonl.tmp.%d_%d" % (os.getpid(), time.time_ns()))
+    with open(tmp, "w", encoding="utf-8") as f:
+        f.write(existing + new_line)
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(tmp, pending)
 
 
 if __name__ == "__main__":
