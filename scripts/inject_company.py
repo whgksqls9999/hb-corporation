@@ -1,5 +1,8 @@
-"""SessionStart 훅: HB Corporation 헌법 + 리더 운영 규칙을 세션 컨텍스트에 주입한다.
-카드가 임계치를 넘으면 아우터루프(consolidation) 권고도 함께 주입한다."""
+"""SessionStart 훅: HB Corporation 헌법 + 리더 운영 규칙 + 프로젝트 L3(project.md)를
+세션 컨텍스트에 주입한다. 카드가 임계치를 넘으면 아우터루프(consolidation) 권고도 함께 주입한다.
+
+- 헌법(company.md/constitution.md): 플러그인 루트에서 읽어 항상 주입.
+- L3(<cwd>/.hb/project.md): 헌법만 강제되던 빈틈 보완. 작으면 통째, 크면 목차+강제 Read 지시."""
 import os
 import json
 import sys
@@ -9,6 +12,7 @@ sys.stdin.reconfigure(encoding="utf-8", errors="replace")
 sys.stdout.reconfigure(encoding="utf-8")
 
 CONSOLIDATE_THRESHOLD = 15  # 카드가 이 수를 넘으면 정리 권고
+L3_MAX_BYTES_DEFAULT = 24000  # project.md 가 이보다 크면 통째 대신 목차만 주입
 
 
 def _root() -> str:
@@ -46,8 +50,45 @@ def _count_cards(cwd: str) -> int:
     return total
 
 
+def _project_l3(cwd: str) -> str:
+    """L3(project.md) 주입 블록. 작으면 통째, 크면 목차+강제 Read 지시(컨텍스트 폭주 방지)."""
+    try:
+        with open(os.path.join(cwd, ".hb", "project.md"), encoding="utf-8") as f:
+            text = f.read().strip()
+    except OSError:
+        return ""  # L3 없음 → 주입 안 함
+    if not text:
+        return ""
+
+    try:
+        max_bytes = int(os.environ.get("HB_L3_MAX_BYTES", str(L3_MAX_BYTES_DEFAULT)))
+    except ValueError:
+        max_bytes = L3_MAX_BYTES_DEFAULT
+
+    header = "\n\n---\n\n# L3 전략층 — 이 워크스페이스 하드 제약 (`.hb/project.md`)\n\n"
+    size = len(text.encode("utf-8"))
+
+    if size <= max_bytes:
+        return (
+            header + text +
+            "\n\n[강제] 위 L3 는 이 프로젝트의 하드 제약이다. 트리아지·위임 시 "
+            "건드리는 레포/주제의 섹션을 반드시 반영하고, 부서 스폰 task 에 실어 보내라."
+        )
+
+    # 대형 파일: 통째 주입 대신 목차(헤더 라인)만 + 강제 Read 지시
+    toc = "\n".join(ln for ln in text.splitlines() if ln.lstrip().startswith("#"))
+    return (
+        header +
+        f"[주의] L3 파일이 큼({size}B > {max_bytes}B) → 전체 대신 목차만 주입한다.\n\n"
+        + toc +
+        "\n\n[강제] 트리아지에서 건드리는 레포/주제에 해당하는 섹션을 `.hb/project.md` 에서 "
+        "Read 로 직접 읽어 반영하라. 목차에 있는 제약을 '못 봤다'는 변명은 없다."
+    )
+
+
 def main() -> None:
     root = _root()
+    cwd = _cwd()
     company = _read(root, "company.md")
     constitution = _read(root, "constitution.md")
 
@@ -58,7 +99,10 @@ def main() -> None:
         "---\n\n" + company + "\n\n---\n\n" + constitution
     )
 
-    cards = _count_cards(_cwd())
+    # L3(project.md) 강제 주입 — 헌법만 강제하던 빈틈 보완
+    context += _project_l3(cwd)
+
+    cards = _count_cards(cwd)
     if cards > CONSOLIDATE_THRESHOLD:
         context += (
             f"\n\n---\n\n[아우터루프 권고] 이 프로젝트의 memory 카드가 {cards}장이다 "
