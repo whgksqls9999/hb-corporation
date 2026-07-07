@@ -1,5 +1,9 @@
-"""PostToolUse 훅: 부서(서브에이전트) 작업이 끝날 때마다 보고를 장부에 임시저장한다.
-(매드캣 gnosis_save_reflection 등가 — LLM 개입 없이 기계적으로 저장, 유실 방지)"""
+"""SubagentStop 훅: 부서(서브에이전트) 작업이 끝날 때마다 최종 보고를 장부에 임시저장한다.
+(LLM 개입 없이 기계적으로 저장, 유실 방지)
+
+이 하네스는 Agent 스폰을 async 로 띄워 PostToolUse 가 '런치 ack'(prompt 되돌이)만 보므로,
+완료 시점에 뜨는 SubagentStop 을 쓴다. 보고 텍스트는 페이로드 last_assistant_message 에 직접 온다
+(트랜스크립트 파싱 불필요 — 2026-07-07 실측 확인)."""
 import json
 import os
 import sys
@@ -9,7 +13,7 @@ sys.stdin.reconfigure(encoding="utf-8", errors="replace")
 sys.stdout.reconfigure(encoding="utf-8")
 
 DEPARTMENTS = ("strategy-director", "dev-manager", "qa-manager")
-MAX_LEN = 2000  # 보고 저장 상한 (토큰 억제)
+MAX_LEN = 4000  # 보고 저장 상한 (토큰 억제)
 
 
 def main() -> None:
@@ -18,20 +22,20 @@ def main() -> None:
     except Exception:
         return
 
-    tool_input = data.get("tool_input") or {}
-    agent = str(tool_input.get("subagent_type") or tool_input.get("agent_type") or "")
+    # SubagentStop 페이로드: agent_type 로 부서만 골라낸다
+    # (예: "hb-corporation:dev-manager" 또는 "dev-manager" — substring 매칭으로 둘 다 커버)
+    agent = str(data.get("agent_type") or "")
     if not any(d in agent for d in DEPARTMENTS):
-        return  # 부서 스폰만 기록 (scribe-manager, 기타 서브에이전트는 무시)
+        return  # 부서 서브에이전트만 기록 (scribe-manager·기타 서브에이전트는 무시)
 
-    output = data.get("tool_output") or data.get("tool_response") or ""
-    if not isinstance(output, str):
-        output = json.dumps(output, ensure_ascii=False)
-    prompt = str(tool_input.get("prompt") or "")
+    report = data.get("last_assistant_message") or ""
+    if not isinstance(report, str):
+        report = json.dumps(report, ensure_ascii=False)
 
     entry = {
         "agent": agent,
-        "task": prompt[:300],
-        "report": output[:MAX_LEN],
+        "agent_id": data.get("agent_id"),
+        "report": report[:MAX_LEN],
     }
 
     cwd = data.get("cwd") or os.getcwd()
