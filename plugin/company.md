@@ -9,20 +9,24 @@
 
 ## 2. 요청 분류 (Triage)
 파일 갯수가 아니라 **작업의 성격**으로 판단한다. 사용자는 고르지 않는다.
-- **Simple** — 단일 관심사, 조회·질문·읽기·국소 수정 → 리더가 직접 처리.
+- **Simple** — 단일 관심사, 조회·질문·읽기·국소 수정 → 리더가 직접 처리. **plan 문서를 쓰지 않는다.**
 - **Team** — 구현+검증 함께 / 설계 판단 / 여러 관심사 얽힘 → 부서에 위임.
 
 ## 3. 부서 (서브에이전트)
 Team이면 **필요한 부서만** Agent 도구로 스폰. 전원 소집 금지.
-- `strategy-director` — 설계·접근·기술부채 (코드 안 짬)
+- `strategy-director` — 설계·접근·기술부채 (코드 안 짬, 산출물 = `.hb/design/plans/…` plan 파일)
 - `dev-manager` — 구현·테스트 작성(test-first)·리팩토링
 - `qa-manager` — 검증·테스트 실행/리뷰·헌법 게이트 (테스트를 쓰지 않음)
 - `scribe-manager` — 서기: 작업 기록·memory 축적 (팀 작업 마무리 단계)
 
-흐름: `strategy-director`(설계) → `dev-manager`(구현) → `qa-manager`(검증) → `scribe-manager`(기록). 간단하면 dev → qa → scribe.
+흐름: `strategy-director`(plan 파일 작성) → **사용자 승인** → `dev-manager`(구현) → `qa-manager`(검증) → `scribe-manager`(기록). 간단하면 dev → qa → scribe.
 
-**중요:** 부서를 스폰할 때 task에 (a) 관련 헌법 규칙과 (b) 관련 memory 패턴을 함께 넣어준다.
+**문서 게이트(HITL):** strategy 보고를 받으면 리더는 **plan 경로를 사용자에게 제시하고 승인을 받은 뒤** `dev-manager`를 스폰한다. 승인 없이 dev를 스폰하지 않는다.
+사용자가 승인하면 **리더가** 그 plan 파일의 `> **상태:**`를 `draft` → `approved`로 바꾸고 나서 dev를 스폰한다 (승인 사실이 파일에 남아야 한다). `done`은 scribe가 닫는다.
+
+**중요:** 부서를 스폰할 때 task에 (a) 관련 헌법 규칙, (b) 관련 memory 패턴, (c) **plan이 있으면 그 경로**를 함께 넣어준다.
 부서 서브에이전트는 플러그인의 헌법 파일을 직접 못 읽으므로, 리더가 전달해야 한다.
+plan 경로를 빠뜨리면 dev·qa가 문서를 못 보고 게이트가 조용히 무력화된다.
 
 ## 4. qa-manager REJECT 처리 (Reflexion → HITL)
 - REJECT → 사유를 `dev-manager`에게 전달해 **1회 재작업**.

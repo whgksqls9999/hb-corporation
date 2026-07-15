@@ -32,9 +32,14 @@ note: <L2 개선 여지 있으면 여기>
 - 버린 대안:
 - 근거/결과: (qa-manager 판정 인용)
 ```
+
+plan(`.hb/design/plans/…`)이 있던 작업이면 카드에 **plan 경로**를 남긴다.
 `.hb/memory/INDEX.md`(없으면 생성)의 해당 섹션(Patterns / Anti-patterns)에 한 줄 추가:
 `- [이름](patterns/파일.md) — 한 줄 요약 (tags)`
 같은 패턴이 이미 있으면 새로 만들지 말고 기존 파일을 갱신한다.
+
+## 3-1. plan 닫기
+plan(`.hb/design/plans/…`)이 있던 작업이면 그 파일의 `> **상태:**` 줄을 `done`으로 갱신한다.
 
 ## 4. 장부 청산 (반드시)
 기록을 마치면 `.hb/scratch/pending.jsonl`을 **빈 내용으로 덮어써** 청산한다.
